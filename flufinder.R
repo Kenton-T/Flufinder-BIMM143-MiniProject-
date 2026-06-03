@@ -1,22 +1,37 @@
 
+# Load fasta files
+upload_fasta <- function(fasta_filename) {
+  
+  #Opening seqinr library for handling FASTA files; make sure you have seqinr installed
+  library(seqinr)
+  
+  #Reading the fasta file
+  read.fasta(fasta_filename, seqtype = "AA", as.string = TRUE,
+             set.attributes = FALSE)
+}
 
-#function 2
 
+# Simulate trypsin digest 
 trypsinize <- function(proteins) {
   
   library(stringr)
   
   lapply(proteins, str_split_1, pattern="(?<=R|K)")
-  
 }
 
 
+# Split input peptide sequence into list of residues
+split_peptides <- function(peptides) {
+  
+  # Opening stringr for simple string manipulation
+  library(stringr)
+  
+  #Splitting peptides into individual amino acids using str_split; generates a list of lists of amino acids for each peptide
+  lapply(peptides, str_split, pattern="")
+}
 
 
-
-#function 4
-
-
+# Calculates mass of a peptide chain
 plitpeptides_to_masses <- function(aa) {
   
   # Generating a vector of masses for each amino acid
@@ -35,26 +50,35 @@ plitpeptides_to_masses <- function(aa) {
   
   # Unlisting the inner lists to generate a list of vectors of masses for each protein
   lapply(peptide_masses, unlist)
-  
 }
 
 
+# Compare known/predicted size of peptides to experimental observations
+count_matching_masses <- function(protein_masses, sample) {
+  
+  # Virus masses is a list of masses for each protein so we use sapply to
+  # iterate over the list; sum (of TRUEs) is used to count the number of
+  # times a mass in the sample is found (%in%) among the masses of each of
+  # the proteins (virus_masses); note that masses are converted into strings
+  # (as.character) because %in% is not very reliable with numbers
+  df <- as.data.frame(sapply(protein_masses, function (x)
+    sum(as.character(sample) %in% as.character(x))))
+  
+  # Adding peptide_counts as the column name of the counts column
+  names(df) <- "peptide_counts"
+  return(df)
+}
 
 
-
-
-
-#function 6
-
-
+# Plots results of peptide hits 
 ggbarplot <- function(peptide_counts_table) {
   
   library(ggplot2)
+  
   # Generating a barplot from the peptide counts dataframe
   ggplot(peptide_counts_table) +
     aes(rownames(peptide_counts_table), peptide_counts) +
     geom_col(fill="blue", width=0.5) +
     theme_bw() +
     labs(x="Flu Strain", y="Peptide Counts")
-  
 }
