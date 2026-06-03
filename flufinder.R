@@ -32,7 +32,7 @@ split_peptides <- function(peptides) {
 
 
 # Calculates mass of a peptide chain
-plitpeptides_to_masses <- function(aa) {
+splitpeptides_to_masses <- function(aa) {
   
   # Generating a vector of masses for each amino acid
   aa_masses <- c(A=71.037, R=156.101, N=114.042, D=115.026, C=103.009,
